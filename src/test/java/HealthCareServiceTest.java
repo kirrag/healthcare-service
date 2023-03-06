@@ -22,11 +22,30 @@ import ru.netology.patient.service.medical.MedicalServiceImpl;
 public class HealthCareServiceTest {
 	@Test
 	public void MedicalServiceImpl() {
-		PatientInfoRepository patientInfoRepository = Mockito.mock(PatientInfoFileRepository.class)
-		Mockito.when(patientInfoRepository.getById()).thenReturn("Добро пожаловать");
+		PatientInfoRepository patientInfoRepository = Mockito.mock(PatientInfoFileRepository.class);
+		Mockito.when(patientInfoRepository.getById("dd058c21-cade-4c6a-b72c-dc609e1dfa43"))
+			.thenReturn(new PatientInfo("dd058c21-cade-4c6a-b72c-dc609e1dfa43", 
+				"Иван", "Петров", LocalDate.of(1980, 11, 26), 
+				new HealthInfo(new BigDecimal("36.65"), new BloodPressure(120, 80))));
 
 		SendAlertService alertService = new SendAlertServiceImpl();
         MedicalService medicalService = new MedicalServiceImpl(patientInfoRepository, alertService);
+		
+        BloodPressure currentPressure = new BloodPressure(60, 120);
+        medicalService.checkBloodPressure("dd058c21-cade-4c6a-b72c-dc609e1dfa43", currentPressure);
+
+        BigDecimal currentTemperature = new BigDecimal("37.9");
+        medicalService.checkTemperature("dd058c21-cade-4c6a-b72c-dc609e1dfa43", currentTemperature);
+
+	}
+
+	@Test
+	public void sendAlertServiceTest() {
+		SendAlertService alertService = new SendAlertServiceImpl();
+
+		doNothing().when(alertService).sendAlertService("Hello");
+   		alertService.send("Hello");
+		verify(alertService, times(1)).send("Hello");
 
 	}
 }
